@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: ghcr.io/linuxserver/wireguard:latest  
+    container_name: wireguard
+    privileged: true
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - SERVERPORT=51820
+      - PEERS=1
+      - PEERDNS=auto
+      - INTERNAL_SUBNET=10.69.69.0/24
+    volumes:
+      - ./config:/config
+      - /lib/modules:/lib/modules
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+    restart: unless-stopped
+    networks:
+      vpn_net:
+        ipv4_address: 10.69.69.1
+
+networks:
+  vpn_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.69.69.0/24
