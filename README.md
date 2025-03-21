@@ -301,6 +301,12 @@ If you encounter connectivity issues:
 - [Wireguard](https://www.wireguard.com/)
 - [linuxserver/wireguard](https://github.com/linuxserver/docker-wireguard) for the Docker images
 
+## Aditional
+
+
+- [Blog: Crea una VPN a tu casa con Wireguard (aunque tengas CGNAT)](https://blog.edunavajas.com/blog/wireguard-cgnat) - Tutorial completo con explicaciones sobre CGNAT y cómo solucionarlo
+- [Video tutorial: Configuración de Wireguard con CGNAT](https://youtu.be/faKYN92QTUU) - Demostración visual paso a paso
+
 ---
 
 For more detailed information or support, please open an issue on this repository.
