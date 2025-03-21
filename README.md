@@ -6,6 +6,7 @@ This repository contains scripts and configuration files to set up a secure VPN 
 
 - [Overview](#overview)
 - [Requirements](#requirements)
+- [Prerequisites Installation](#prerequisites-installation)
 - [VPS Server Setup](#vps-server-setup)
 - [Raspberry Pi Client Setup](#raspberry-pi-client-setup)
 - [Testing the Connection](#testing-the-connection)
@@ -35,6 +36,72 @@ This setup establishes a Wireguard VPN tunnel with the following features:
 - Internet connection
 - Root or sudo access
 
+## Prerequisites Installation
+
+### Docker Installation
+
+#### On Ubuntu/Debian (VPS and Raspberry Pi):
+
+```bash
+# Actualizar el sistema
+sudo apt update
+sudo apt upgrade -y
+
+# Instalar dependencias necesarias
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+
+# Añadir clave GPG oficial de Docker
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+# Añadir repositorio de Docker
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# Actualizar e instalar Docker
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io
+
+# Añadir usuario actual al grupo docker
+sudo usermod -aG docker $USER
+
+# Instalar Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+# Verificar instalación
+docker --version
+docker-compose --version
+```
+
+### Generar Claves Wireguard
+
+Es necesario generar claves públicas y privadas tanto en el servidor VPS como en el cliente Raspberry Pi. Ejecute el siguiente comando en ambos sistemas:
+
+```bash
+# Crear directorio config si no existe
+mkdir -p config
+
+# Generar claves con los permisos adecuados
+cd config
+umask 077 && sudo sh -c 'wg genkey | tee privatekey | wg pubkey > publickey'
+
+# Verificar que las claves se han creado correctamente
+ls -la
+```
+
+### Permisos de Ejecución para los Scripts
+
+Tanto en el servidor VPS como en el cliente Raspberry Pi, debe asignar permisos de ejecución a los scripts:
+
+```bash
+# En el servidor VPS
+cd wireguard-cgnat/vps
+sudo chmod +x setup-wireguard-tunnel.sh
+
+# En el cliente Raspberry Pi
+cd wireguard-cgnat/raspberry
+sudo chmod +x setup-wireguard-client.sh
+```
+
 ## VPS Server Setup
 
 1. **Clone the Repository**
@@ -55,10 +122,10 @@ This setup establishes a Wireguard VPN tunnel with the following features:
 
 3. **Start the Wireguard Server**
 
-    Run the setup script to configure and start the Wireguard server:
+    Ejecute el script de configuración con privilegios de sudo:
 
     ```bash
-    bash setup-wireguard-tunnel.sh
+    sudo ./setup-wireguard-tunnel.sh
     ```
 
     This script will:
@@ -128,12 +195,12 @@ This setup establishes a Wireguard VPN tunnel with the following features:
     PersistentKeepalive = 25
     ```
 
-4. **Start the Wireguard Client**
+3. **Start the Wireguard Client**
 
-    Run the setup script to configure and start the Wireguard client:
+    Ejecute el script de configuración con privilegios de sudo:
 
     ```bash
-    bash setup-wireguard-client.sh
+    sudo ./setup-wireguard-client.sh
     ```
 
     This script will:
@@ -228,9 +295,6 @@ If you encounter connectivity issues:
     docker-compose up -d
     ```
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
